@@ -1,12 +1,15 @@
-|=-----=[ Blink example ]=-----=|
+|=-----=[ Blink example with event  ]=-----=|
 
-This application is a simple periodic example wich toggles the blue led of the board.
+This application is  constant of 4 task 
+task 1 has name SWC1_Init which have a piese of code which toggle RED led   .
+task 2 has name SWC2_Init which have a piese of code which toggle orange led and dactive anathor task SWC1_MainTask   .
+task 3 has name SWC1_MainTask which have apiece of code to read the utton and set event 
+task 4 has name SWC2_MainTask whih have ahight priorty but it in waiting state becouse it wait for event an will wor when this even is set  
 Have a look into "blink.oil" file.
 
-The system is based scheduled with a 1ms SysTick "SystemCounter".
 
-The task "blink" toggles the BLUE led when executed.
-This is not scheduled when the program starts.
+
+
 
 This task is activated by the alarm "blink_blink".
 This alarm starts 250ms (ALARMTIME) after "StartOS".
