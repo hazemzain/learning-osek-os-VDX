@@ -1,0 +1,106 @@
+OIL_VERSION = "2.5";
+
+IMPLEMENTATION trampoline {
+
+    /* This fix the default STACKSIZE of tasks */
+    TASK {
+        UINT32 STACKSIZE = 300 ;
+    } ;
+
+    /* This fix the default STACKSIZE of ISRs */
+    ISR {
+        UINT32 STACKSIZE = 200 ;
+    } ;
+};
+
+CPU blink {
+  OS config {
+    STATUS = EXTENDED;
+    
+	  SHUTDOWNHOOK = TRUE;
+    PRETASKHOOK  = TRUE;
+    POSTTASKHOOK = TRUE;
+
+    PAINT_STACK = TRUE;
+    PAINT_REGISTERS = TRUE;
+    
+    BUILD = TRUE {
+      TRAMPOLINE_BASE_PATH = "../../../../../..";
+      APP_SRC = "blink.c";
+      APP_NAME = "blink_exe";
+      CFLAGS  = "-O0"; 
+      LDFLAGS = "-Map=blink.map";
+      COMPILER = "arm-none-eabi-gcc";
+      ASSEMBLER = "arm-none-eabi-as";
+      LINKER = "arm-none-eabi-ld";
+      COPIER = "arm-none-eabi-objcopy";
+      SYSTEM = PYTHON;
+    };
+    SYSTEM_CALL = TRUE;
+    MEMMAP = TRUE {
+      COMPILER = gcc;
+      LINKER = gnu_ld { SCRIPT = "script.ld"; };
+      ASSEMBLER = gnu_as;
+      MEMORY_PROTECTION = FALSE;
+    };
+  };
+  /************************************************/
+  APPMODE APPMODE_1 {};
+  /************************************************/
+  TASK SWC1_Init {
+    SCHEDULE = NON;
+    PRIORITY = 1;
+    ACTIVATION = 1;
+    AUTOSTART = TRUE { 
+      APPMODE = APPMODE_1; 
+    }; 
+  };
+  /************************************************/
+  TASK SWC2_Init {
+    SCHEDULE = NON;
+    PRIORITY = 2;
+    ACTIVATION = 1;
+     AUTOSTART = TRUE { 
+      APPMODE = APPMODE_1; 
+    }; 
+  };
+/******************************************************/
+TASK SWC1_MainTask
+{
+  SCHEDULE = FULL;
+    PRIORITY = 3;
+    ACTIVATION = 1;
+    STACKSIZE=300;
+     AUTOSTART = FALSE ;
+  
+};
+/*****************************************************/
+TASK SWC2_MainTask
+{
+  SCHEDULE = FULL;
+    PRIORITY = 4;
+    ACTIVATION = 1;
+    STACKSIZE=300;
+     AUTOSTART = TRUE 
+     {
+      APPMODE = APPMODE_1; 
+
+     };
+     EVENT =event1;
+     EVENT=event2;
+  
+};
+/*******************************************************/
+/****EVENT******************************************/
+
+EVENT event1
+{
+  MASK=0X01;
+};
+
+EVENT event2
+{
+  MASK=0X02;
+};
+
+};
